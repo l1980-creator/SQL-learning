@@ -1,0 +1,3 @@
+select productCode,
+    count(productCode) from products
+group by productCode;
