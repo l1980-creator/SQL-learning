@@ -1,0 +1,101 @@
+use exam;
+select * from products
+order by quantityInStock desc;
+
+select productCode,
+    count(productCode) from products
+group by productCode;
+
+select count(*) from products;
+
+select * from orders;
+select * from customers;
+select c.contactFirstName,
+       c. contactLastName,
+
+COUNT(o.orderNumber) as orders_count
+from customers c
+
+JOIN
+    orders o
+USING(customerNumber)
+where orderNumber>10
+group by c.contactFirstName, c. contactLastName
+order by orders_count desc ;
+
+SELECT
+    CASE
+        WHEN (100.0 * SUM(CASE WHEN status = 'On Hold' THEN 1 ELSE 0 END) / COUNT(*)) > 5
+        THEN 'Překračuje 5 %'
+        ELSE 'Nepřekračuje 5 %'
+    END AS stavObjednávek
+FROM orders;
+
+select
+    COUNT(o.orderNumber)
+    from orders o
+JOIN
+    customers c
+where
+    c.country='USA'
+and
+ o.orderdate>=2003-01-01;
+
+select * from products;
+select productVendor,
+       quantityInStock
+from products
+order by(quantityInStock)DESC ;
+
+SELECT productVendor,
+       SUM(quantityInStock) AS totalStock
+FROM products
+GROUP BY productVendor
+ORDER BY totalStock DESC;
+
+select * from employees;
+select
+    count (reportsTo)
+from employees
+where email;
+
+select
+    count(reportsTo)
+from employees
+where reportsTo=1621;
+
+select * from employees;
+select
+    count(distinct employeeNumber)
+from employees;
+
+select
+    count(distinct officeCode)
+from employees;
+
+select * from customers;
+select
+e.lastName,
+count(c.customerName) as sum
+from employees e
+
+JOIN
+    customers c
+on e.employeeNumber = c.salesRepEmployeeNumber
+where
+    lastName='Bott'
+GROUP By e.lastName;
+
+
+
+select
+e.lastName,
+count(c.customerName) as sum
+from employees e
+
+JOIN
+    customers c
+on e.employeeNumber = c.salesRepEmployeeNumber
+where
+    lastName='Castillo'
+GROUP By e.lastName;
