@@ -8,14 +8,10 @@ group by productCode;
 
 select count(*) from products;
 
-select * from orders;
-select * from customers;
 select c.contactFirstName,
        c. contactLastName,
-
 COUNT(o.orderNumber) as orders_count
 from customers c
-
 JOIN
     orders o
 USING(customerNumber)
