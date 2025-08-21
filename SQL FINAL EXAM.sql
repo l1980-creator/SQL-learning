@@ -22,9 +22,9 @@ order by orders_count desc ;
 SELECT
     CASE
         WHEN (100.0 * SUM(CASE WHEN status = 'On Hold' THEN 1 ELSE 0 END) / COUNT(*)) > 5
-        THEN 'Překračuje 5 %'
-        ELSE 'Nepřekračuje 5 %'
-    END AS stavObjednávek
+        THEN 'Over 5 %'
+        ELSE 'Under 5 %'
+    END AS Order_status
 FROM orders;
 
 select
