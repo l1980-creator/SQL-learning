@@ -185,7 +185,7 @@ WHERE reportsTo IS NULL;
 - In organizational structures, NULL in a reportsTo column often indicates leadership roles.
 - Using COUNT(*) with a WHERE clause lets me quantify specific subsets of data — in this case, the leadership tier.
 
-# 🧠 Task 08 – Verifying Managerial Structure: Two Managers with Six Direct Reports Each
+# Task 08 – Verifying Managerial Structure: Two Managers with Six Direct Reports Each
 Objective: Confirm the accuracy of the statement: There are precisely two employees, each of whom is reported to by six subordinates.
 ✅ Query:
 ```sql
@@ -203,12 +203,38 @@ HAVING COUNT(*) = 6;
 - COUNT(*) calculates how many employees report to each manager.
 - HAVING COUNT(*) = 6 filters the result to include only those managers with exactly six direct reports.
 
+🛠 Step-by-Step Breakdown:
+- SELECT reportsTo AS managerNumber
+→ We take the reportsTo column, which indicates the manager each employee reports to.
+→ We rename it to managerNumber for clarity.
+- COUNT(*) AS direct_reports
+→ This counts how many employees report to each manager.
+→ The result is labeled direct_reports.
+- FROM employees
+→ We're working with the employees table, which contains all employee records.
+- WHERE reportsTo IS NOT NULL
+→ We exclude employees who don’t report to anyone (e.g., the CEO).
+→ We're only interested in those who have a manager.
+- GROUP BY reportsTo
+→ We group employees by their manager.
+→ This creates clusters of employees under each manager.
+- HAVING COUNT(*) = 6
+→ From those groups, we keep only the ones with exactly 6 employees.
+→ So we’re identifying managers with six direct reports — no more, no less.
+
+🎯 What Are We Verifying?
+We want to confirm the statement:
+“There are exactly two employees who each have six subordinates.”
+
+This query shows the manager IDs and the number of direct reports.
+If the result returns two rows, the statement is true.
+
 🧠 What I Learned:
 - This query doesn’t just find managers with six reports — it helps validate a specific organizational claim.
 - By running this query and counting the resulting rows, we can confirm whether exactly two managers meet the criteria.
 - It’s a great example of using SQL not just for data retrieval, but for truth verification within a business context.
 
-# 🧠 Task 09 – Counting Customers Assigned to a Specific Sales Rep
+# Task 09 – Counting Customers Assigned to a Specific Sales Rep
 Objective: Verify how many customers are assigned to the sales representative with the last name Bott.
 ✅ Query:
 ```sql
@@ -230,6 +256,8 @@ GROUP BY e.lastName;
 - This query is a great example of combining filtering, joining, and aggregation to answer a specific business question.
 - It shows how SQL can be used to audit sales assignments and verify workload distribution.
 - The result confirms whether Bott is actively managing customer relationships — and how many.
+
+  
 
 
 
