@@ -32,10 +32,11 @@ select
     from orders o
 JOIN
     customers c
+    on o.customerNumber = c.customerNumber
 where
     c.country='USA'
 and
- o.orderdate>=2003-01-01;
+ o.orderdate>='2003-01-01';
 
 select * from products;
 select productVendor,
@@ -49,25 +50,15 @@ FROM products
 GROUP BY productVendor
 ORDER BY totalStock DESC;
 
-select * from employees;
-select
-    count (reportsTo)
-from employees
-where email;
+SELECT COUNT(*) AS top_level_count
+FROM employees
+WHERE reportsTo IS NULL;
 
-select
-    count(reportsTo)
-from employees
-where reportsTo=1621;
-
-select * from employees;
-select
-    count(distinct employeeNumber)
-from employees;
-
-select
-    count(distinct officeCode)
-from employees;
+SELECT reportsTo AS managerNumber, COUNT(*) AS direct_reports
+FROM employees
+WHERE reportsTo IS NOT NULL
+GROUP BY reportsTo
+HAVING COUNT(*) = 6;
 
 select * from customers;
 select
@@ -83,15 +74,3 @@ where
 GROUP By e.lastName;
 
 
-
-select
-e.lastName,
-count(c.customerName) as sum
-from employees e
-
-JOIN
-    customers c
-on e.employeeNumber = c.salesRepEmployeeNumber
-where
-    lastName='Castillo'
-GROUP By e.lastName;
