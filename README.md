@@ -99,5 +99,140 @@ Logic Summary
 - The result is labeled as 'Over 5 %' or 'Under 5 %' based on the threshold.
 This approach makes the query flexible and readable, especially when applying conditional logic directly within aggregate functions.
 
+# Task 05 – Syntax Pitfalls: Cartesian Product & Date Literals
+Objective: Understand how small syntax mistakes in SQL can lead to major logical errors, such as unintended Cartesian products or incorrect filtering.
+❌ Problematic Query:
+
+```sql
+SELECT COUNT(o.orderNumber)
+FROM orders o
+JOIN customers c
+WHERE c.country = 'USA'
+  AND o.orderDate >= 2003-01-01;
+```
+
+⚠️ Issues:
+- Missing ON clause in JOIN: Without specifying how to join orders and customers, the query performs a Cartesian product, pairing every row from one table with every row from the other.
+- Unquoted date literal: 2003-01-01 is interpreted as a math expression (2003 - 1 - 1 = 2001), not a date. This leads to incorrect filtering
+✅ Corrected Query:
+```sql
+SELECT COUNT(o.orderNumber)
+FROM orders o
+JOIN customers c ON o.customerNumber = c.customerNumber
+WHERE c.country = 'USA'
+  AND o.orderDate >= '2003-01-01';
+```
+
+🧾 Explanation:
+- The ON clause ensures proper row matching between tables.
+- The date is enclosed in quotes to be treated as a valid SQL DATE value.
+- This version returns the correct count of orders from U.S. customers placed on or after January 1, 2003.
+
+💡 Lesson learned: Even tiny syntax oversights can drastically affect query results. Always validate joins and literal formats to avoid silent logic errors.
+
+# Task 06 – Aggregating Stock by Vendor
+Objective: Use SQL aggregation to calculate total stock per product vendor and sort the results.
+📝 My Approach:
+At first, I wanted to get a general overview of the data, so I started with this query
+```sql
+SELECT * FROM products;
+```
+Then I tried listing vendors and their stock quantities:
+```sql
+SELECT productVendor,
+       quantityInStock
+FROM products
+ORDER BY quantityInStock DESC;
+```
+
+But I quickly realized that some vendors appeared multiple times, since each product has its own row. That meant I wasn’t seeing the total stock per vendor — just individual product entries.
+✅ Final Query:
+```sql
+SELECT productVendor,
+       SUM(quantityInStock) AS totalStock
+FROM products
+GROUP BY productVendor
+ORDER BY totalStock DESC;
+```
+🔍 Explanation:
+- SUM(quantityInStock) calculates the total number of items in stock for each vendor.
+- GROUP BY productVendor groups the results by vendor name.
+- ORDER BY totalStock DESC sorts vendors from the highest to the lowest total stock.
+- 
+🧠 What I Learned:
+- Aggregation is essential when working with repeated values across rows.
+- Without GROUP BY, I wouldn’t be able to get a clear summary of stock per vendor.
+- Aggregate functions like SUM, AVG, MAX, and COUNT operate over sets of rows — but SQL needs to know how to group those rows before applying the function.
+- That’s why GROUP BY is required: it tells SQL to split the data into logical groups (e.g. by vendor), and then apply the aggregation to each group separately.
+- If I used SUM(quantityInStock) without GROUP BY productVendor, SQL wouldn’t know whether I want the total stock for all products, or per vendor — and it would either throw an error or give misleading results.
+- So in short:
+GROUP BY is the bridge between raw data and meaningful summaries.
+
+# Task 07🧮 Counting Employees Who Are Not Reporting to Anyone...
+Objective: Find out how many employees are at the top of the organizational hierarchy — i.e., those who don’t report to anyone.
+```sql
+SELECT COUNT(*) AS top_level_count
+FROM employees
+WHERE reportsTo IS NULL;
+```
+🔍 Explanation:
+- reportsTo IS NULL filters for employees who don’t have a manager listed — meaning they’re at the top level.
+- COUNT(*) counts how many such employees exist.
+- The result gives a single number: the total count of top-level individuals in the company.
+  
+🧠 What I Learned:
+- NULL values are useful for identifying missing or undefined relationships in a dataset.
+- In organizational structures, NULL in a reportsTo column often indicates leadership roles.
+- Using COUNT(*) with a WHERE clause lets me quantify specific subsets of data — in this case, the leadership tier.
+
+# 🧠 Task 08 – Verifying Managerial Structure: Two Managers with Six Direct Reports Each
+Objective: Confirm the accuracy of the statement: There are precisely two employees, each of whom is reported to by six subordinates.
+✅ Query:
+```sql
+SELECT reportsTo AS managerNumber,
+       COUNT(*) AS direct_reports
+FROM employees
+WHERE reportsTo IS NOT NULL
+GROUP BY reportsTo
+HAVING COUNT(*) = 6;
+```
+🔍 Explanation:
+- reportsTo identifies the manager each employee reports to.
+- WHERE reportsTo IS NOT NULL excludes top-level employees who don’t report to anyone.
+- GROUP BY reportsTo aggregates employees by their manager.
+- COUNT(*) calculates how many employees report to each manager.
+- HAVING COUNT(*) = 6 filters the result to include only those managers with exactly six direct reports.
+
+🧠 What I Learned:
+- This query doesn’t just find managers with six reports — it helps validate a specific organizational claim.
+- By running this query and counting the resulting rows, we can confirm whether exactly two managers meet the criteria.
+- It’s a great example of using SQL not just for data retrieval, but for truth verification within a business context.
+
+# 🧠 Task 09 – Counting Customers Assigned to a Specific Sales Rep
+Objective: Verify how many customers are assigned to the sales representative with the last name Bott.
+✅ Query:
+```sql
+SELECT e.lastName,
+       COUNT(c.customerName) AS sum
+FROM employees e
+JOIN customers c
+  ON e.employeeNumber = c.salesRepEmployeeNumber
+WHERE e.lastName = 'Bott'
+GROUP BY e.lastName;
+```
+
+🔍 Explanation:
+- JOIN customers ON employeeNumber = salesRepEmployeeNumber links each employee to the customers they manage.
+- WHERE lastName = 'Bott' filters the data to focus only on the employee named Bott.
+- COUNT(customerName) tallies how many customers are assigned to Bott.
+- GROUP BY lastName ensures the count is grouped under Bott’s name.
+🧠 What I Learned:
+- This query is a great example of combining filtering, joining, and aggregation to answer a specific business question.
+- It shows how SQL can be used to audit sales assignments and verify workload distribution.
+- The result confirms whether Bott is actively managing customer relationships — and how many.
+
+
+
+
 
 
